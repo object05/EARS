@@ -166,7 +166,7 @@ N. Veček, M. Črepinšek, M. Mernik, D. Hrnčič. "A comparison between differe
 
 N. Veček, M. Mernik, B. Filipič, and M. Črepinšek. "Parameter tuning with Chess Rating System (CRS-Tuning) for meta-heuristic algorithms." Information Sciences 372 (2016): 446-469. https://www.sciencedirect.com/science/article/pii/S0020025516306430
 
-N. Veček, M. Črepinšek, and M. Mernik. "On the influence of the number of algorithms, problems, and independent runs in the comparison of evolutionary algorithms." Applied Soft Computing 54 (2017): 23-45. https://www.sciencedirect.com/science/article/pii/S0020025516306430
+N. Veček, M. Črepinšek, and M. Mernik. "On the influence of the number of algorithms, problems, and independent runs in the comparison of evolutionary algorithms." Applied Soft Computing 54 (2017): 23-45. https://doi.org/10.1016/j.asoc.2017.01.011
 
 N. Veček, S. H. Liu, M. Črepinšek, and M. Mernik. "On the importance of the artificial bee colony control parameter ‘limit’." Information Technology And Control 46.4 (2017): 566-604. http://www.itc.ktu.lt/index.php/ITC/article/view/18215
 
@@ -175,6 +175,9 @@ M. Ravber, M. Mernik, and M. Črepinšek. "The impact of quality indicators on t
 M. Ravber, M. Mernik, and M. Črepinšek. "Ranking multi-objective evolutionary algorithms using a chess rating system with quality indicator ensemble." 2017 IEEE Congress on Evolutionary Computation (CEC). IEEE, 2017. https://ieeexplore.ieee.org/abstract/document/7969481
 
 M. Ravber, M. Črepinšek, M. Mernik, and T. Kosar. "Tuning Multi-Objective Optimization Algorithms for the Integration and Testing Order Problem." International Conference on Bioinspired Methods and Their Applications. Springer, Cham, 2018. https://link.springer.com/chapter/10.1007/978-3-319-91641-5_20
+
+M. Jesenik, M. Mernik, M. Črepinšek, M. Ravber, and M. Trlep. "Searching for soil models’ parameters using metaheuristics." Applied Soft Computing 69 (2018): 131-148.
+https://doi.org/10.1016/j.asoc.2018.04.045
 
 M. Črepinšek, M. Ravber, M. Mernik, and T. Kosar. "Tuning Multi-Objective Evolutionary Algorithms on Different Sized Problem Sets." Mathematics, 7.9 (2019): 824. https://www.mdpi.com/2227-7390/7/9/824 
 
