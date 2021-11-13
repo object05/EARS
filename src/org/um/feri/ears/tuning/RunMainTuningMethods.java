@@ -46,6 +46,7 @@ package org.um.feri.ears.tuning;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+import org.um.feri.ears.algorithms.tuning.CRO_Tuning;
 import org.um.feri.ears.algorithms.tuning.GSA_Tuning;
 import org.um.feri.ears.tuning.CRSTuning;
 import org.um.feri.ears.tuning.ControlParameter;
@@ -63,7 +64,7 @@ public class RunMainTuningMethods {
     	
     	double draw = 0.0000000001;
     	int decimals = 10;
-    	int runs = 5;  
+    	int runs = 5;
 
     	TuningBenchmark b2 = new TuningBenchmark(draw,dim,eval);
     	b2.setDisplayRatingIntervalChart(false);
@@ -72,14 +73,26 @@ public class RunMainTuningMethods {
     	////public GSA(double RPower, double alfa, double G0)
 
     	ArrayList<ControlParameter> control_parameters = new ArrayList<ControlParameter>();
-        control_parameters.add(new ControlParameter("RPower", "double", 1, 3));
-        control_parameters.add(new ControlParameter("alfa", "double", 5, 50));
-        control_parameters.add(new ControlParameter("G0", "double", 50, 200));
-    	
-        
+        //control_parameters.add(new ControlParameter("RPower", "double", 1, 3));
+        //control_parameters.add(new ControlParameter("alfa", "double", 5, 50));
+        //control_parameters.add(new ControlParameter("G0", "double", 50, 200));
+
+        ////public CRO(int n, int m, double rho, double fbs, double fa, double pd, int attemptsToSettle)
+        control_parameters.add(new ControlParameter("n", "int", 1, 15));
+        control_parameters.add(new ControlParameter("m", "int", 1, 15));
+        control_parameters.add(new ControlParameter("rho", "double", 0.0, 1.0));
+        control_parameters.add(new ControlParameter("fbs", "double", 0.0, 1.0));
+        control_parameters.add(new ControlParameter("fa", "double", 0.0, 1.0));
+        control_parameters.add(new ControlParameter("pd", "double", 0.0, 1.0));
+        control_parameters.add(new ControlParameter("attemptsToSettle", "int", 0, 5));
+
+
+
+
         try {
-        	CRSTuning m = new CRSTuning(CRSTuning.DEBUG_OFF, false, b2, 500);        	
-        	m.tune(runs,control_parameters,GSA_Tuning.class,"GSA",decimals);
+        	CRSTuning m = new CRSTuning(CRSTuning.DEBUG_OFF, false, b2, 2000);
+            m.tune(runs,control_parameters, CRO_Tuning.class,"CRO",decimals);
+        	//m.tune(runs,control_parameters,GSA_Tuning.class,"GSA",decimals);
         	//m.tune(runs,control_parameters,"org.um.feri.ears.algorithms.de3.DEAlgorithm","DE",decimals);
         	
 		} catch (Exception e) {
