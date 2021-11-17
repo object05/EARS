@@ -2,6 +2,9 @@ package org.um.feri.ears.algorithms.so.bwo;
 
 import jdk.internal.vm.compiler.collections.Pair;
 import org.um.feri.ears.algorithms.Algorithm;
+import org.um.feri.ears.algorithms.AlgorithmInfo;
+import org.um.feri.ears.algorithms.Author;
+import org.um.feri.ears.algorithms.EnumAlgorithmParameters;
 import org.um.feri.ears.problems.DoubleSolution;
 import org.um.feri.ears.problems.StopCriterionException;
 import org.um.feri.ears.problems.Task;
@@ -14,22 +17,53 @@ import java.util.List;
 public class BWO extends Algorithm {
 
     @AlgorithmParameter(name = "procreating rate")
-    private float pp;
+    private double pp;
     @AlgorithmParameter(name = "cannibalism rate")
-    private float cr;
+    private double cr;
     @AlgorithmParameter(name = "mutation rate")
-    private float pm;
+    private double pm;
     @AlgorithmParameter(name = "population size")
     private int npop;
     @AlgorithmParameter(name = "max iterations")
     private int maxiter;
-    @AlgorithmParameter(name = "bounds")
+
+
+
+    //@AlgorithmParameter(name = "dof")
+    //private int dof;
+
+
     private ArrayList<Pair<Double,Double>> bounds;
-    @AlgorithmParameter(name = "initial guess")
     private ArrayList<Double> x0;
-    @AlgorithmParameter(name = "dof")
-    private int dof;
-    //disp
+
+    private Task task;
+
+    public BWO() {
+        this(0.6, 0.44, 0.4, 10, 50, 2);
+    }
+
+    public BWO(double pp, double cr, double pm, int npop, int maxiter) {
+        super();
+        this.pp = pp;
+        this.cr = cr;
+        this.pm = pm;
+        this.npop = npop;
+        this.maxiter = maxiter;
+        //this.dof = dof;
+        setDebug(debug);  //EARS prints some debug info
+        ai = new AlgorithmInfo("BWO", "Black widow optimisation", "");
+        ai.addParameter(EnumAlgorithmParameters.UNNAMED1, pp + "");
+        ai.addParameter(EnumAlgorithmParameters.CR, cr + "");
+        ai.addParameter(EnumAlgorithmParameters.P_M, pm + "");
+        ai.addParameter(EnumAlgorithmParameters.POP_SIZE, npop + "");
+        ai.addParameter(EnumAlgorithmParameters.UNNAMED2, maxiter + "");
+        ai.addParameter(EnumAlgorithmParameters.UNNAMED3, dof + "");
+        au = new Author("Alan Hablak", "alan.hablak@student.um.si");
+    }
+
+
+
+
 
     private ArrayList<Double> generateNewPosition(ArrayList<Double> _x0, int _dof, ArrayList<Pair<Double,Double>> _bounds){
         ArrayList<Double> resultPosition = new ArrayList<Double>();
@@ -63,7 +97,12 @@ public class BWO extends Algorithm {
     }
 
     @Override
-    public DoubleSolution execute(Task task) throws StopCriterionException {
+    public DoubleSolution execute(Task taskProblem) throws StopCriterionException {
+        int dof;
+
+        task = taskProblem;
+        dof = task.getNumberOfDimensions();
+
         //todo checks before
         if(bounds != null){
             for (Pair<Double,Double> bound : bounds) {
@@ -87,7 +126,7 @@ public class BWO extends Algorithm {
 
         while (!task.isStopCriterion()){//todo correct place?
             for(int epoch = 0; epoch < maxiter; epoch++){
-                //task.
+
             }
         }
 
