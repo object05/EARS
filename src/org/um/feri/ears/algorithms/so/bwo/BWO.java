@@ -193,10 +193,10 @@ public class BWO extends Algorithm {
         }
         //TODO PYTHON RAND IS INCLUSIVE
         //IS IT ALSO IN HERE???
-        return null;
+        //TODO isstopcriterion
+
+        return task.eval(gBest.getDoubleVariables());//todo already evaled?
     }
-
-
 
     @Override
     public void resetToDefaultsBeforeNewRun() {
