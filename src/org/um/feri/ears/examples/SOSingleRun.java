@@ -1,6 +1,7 @@
 package org.um.feri.ears.examples;
 
 import org.um.feri.ears.algorithms.Algorithm;
+import org.um.feri.ears.algorithms.so.bwo.BWO;
 import org.um.feri.ears.algorithms.so.de.DEAlgorithm;
 import org.um.feri.ears.problems.*;
 import org.um.feri.ears.problems.unconstrained.Sphere;
@@ -16,7 +17,8 @@ public class SOSingleRun {
 
         Task sphere = new Task(problem, StopCriterion.EVALUATIONS, 10000, 0, 0); // set the stopping criterion to max 10000 evaluations
 
-        Algorithm alg = new DEAlgorithm(DEAlgorithm.Strategy.JDE_RAND_1_BIN);
+        //Algorithm alg = new DEAlgorithm(DEAlgorithm.Strategy.JDE_RAND_1_BIN);
+        Algorithm alg = new BWO();
         DoubleSolution best;
         try {
             best = alg.execute(sphere);

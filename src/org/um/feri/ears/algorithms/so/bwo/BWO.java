@@ -12,7 +12,11 @@ import org.um.feri.ears.util.Util;
 import org.um.feri.ears.util.annotation.AlgorithmParameter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+
+
 
 public class BWO extends Algorithm {
 
@@ -34,9 +38,11 @@ public class BWO extends Algorithm {
 
 
     private ArrayList<Pair<Double,Double>> bounds;
+
     private ArrayList<Double> x0;
 
     private Task task;
+
 
     public BWO() {
         this(0.6, 0.44, 0.4, 10, 50);
@@ -101,17 +107,8 @@ public class BWO extends Algorithm {
         int dof;
 
         task = taskProblem;
+        task.enableEvaluationHistory();
         dof = task.getNumberOfDimensions();
-
-        //todo checks before
-        if(bounds != null){
-            for (Pair<Double,Double> bound : bounds) {
-                if(bound.getLeft() > bound.getRight()){
-                    //todo error
-                    return null;
-                }
-            }
-        }
 
         if(x0 != null) dof = x0.size();
         else if(bounds != null) dof = bounds.size();
@@ -124,41 +121,78 @@ public class BWO extends Algorithm {
             popInit.add(generateNewPosition(x0,dof,bounds));
         }
 
-
+        //ok
 
         ArrayList<DoubleSolution> pop = new ArrayList<DoubleSolution>();
         for(int epoch = 0; epoch < maxiter; epoch++) {
             for (ArrayList<Double> l : popInit) {
-                double[] arr = l.stream().mapToDouble(Double::doubleValue).toArray();//todo deepcopy to limit
+                double[] arr = l.stream().mapToDouble(Double::doubleValue).toArray();
                 pop.add(task.eval(arr));
             }
-            ArrayList<DoubleSolution> pop1 = new ArrayList<DoubleSolution>(pop);
+            pop.sort(Comparator.comparing(DoubleSolution::getEval));//todo problematic?
+            ArrayList<DoubleSolution> pop1 = (ArrayList<DoubleSolution>) pop.clone();//todo deepcopy ok?
+            //ok
             ArrayList<DoubleSolution> pop2 = new ArrayList<DoubleSolution>();
             ArrayList<DoubleSolution> pop3 = new ArrayList<DoubleSolution>();
 
             gBest = pop.get(0);
-
+            //ok
             for(int i = 0; i < nr; i++){
                 int i1 = Util.nextInt(0, pop1.size()-1);
                 int i2 = Util.nextInt(0, pop1.size()-1);
                 DoubleSolution p1 = pop1.get(i1);
                 DoubleSolution p2 = pop1.get(i2);
-                ArrayList<DoubleSolution> children = new ArrayList<>();
+                ArrayList<double[]> children = new ArrayList<>();
                 for(int j = 0; j < (int)(dof/2); j++){
                     double alpha = Util.nextDouble();
-                    //c1 and c2 == list of floats
-                    ArrayList<DoubleSolution> COMBINED = new ArrayList<>();
-                    COMBINED.add(p1);
-                    COMBINED.add(p2);
-                    DoubleSolution c1 = new DoubleSolution();
-                    DoubleSolution c2 = new DoubleSolution();
-                    for (DoubleSolution item: COMBINED) {
-
+                    double[] c1 = new double[dof];
+                    double[] c2 = new double[dof];
+                    for(int k = 0; k < dof; k++){
+                        c1[k] = (alpha * p1.getValue(k)) + ((1 - alpha) * p2.getValue(k));
+                        c2[k] = (alpha * p2.getValue(k)) + ((1 - alpha) * p1.getValue(k));
                     }
+                    children.add(c1);
+                    children.add(c2);
                 }
+                if(task.eval(p1.getDoubleVariables()).getEval() < task.eval(p2.getDoubleVariables()).getEval()){
+                    pop1.remove(i1);
+                }
+                else{
+                    pop1.remove(i2);
+                }
+                //ok
 
+                ArrayList<DoubleSolution> tempChildren = new ArrayList<DoubleSolution>();
+                for (double[] l : children) {
+                    tempChildren.add(task.eval(l));
+                }
+                tempChildren.sort(Comparator.comparing(DoubleSolution::getEval));//todo problematic?
+                //ok
+                tempChildren = new ArrayList<>(tempChildren.subList(0, (int)(Math.max(children.size() * cr, 1))));//todo unnecessary and working??
+                for(int j = 0; j < tempChildren.size(); j++){
+                    pop2.add(tempChildren.get(j));
+                }
             }
+            for(int i = 0; i < nm; i++){
+                DoubleSolution m = pop2.get(Util.nextInt(0, pop2.size()-1));
+                int cp1 = Util.nextInt(0, dof-1);
+                int cp2 = Util.nextInt(0, dof-1);
+                List<Double> vars = m.getVariables();
+                double temp = vars.get(cp1);
+                vars.set(cp1, vars.get(cp2));
+                vars.set(cp2, temp);
+                m.setVariables(vars);
+                pop3.add(m);
+            }
+
+            for(int i = 0; i < pop3.size(); i++){
+                pop2.add(pop3.get(i));
+            }
+
+            pop = (ArrayList<DoubleSolution>) pop2.clone();//todo deepcopy??
         }
+        //TODO PYTHON RAND IS INCLUSIVE
+        //IS IT ALSO IN HERE???
         return null;
     }
 
