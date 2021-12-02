@@ -2,6 +2,7 @@ package org.um.feri.ears.examples;
 
 import org.um.feri.ears.algorithms.Algorithm;
 import org.um.feri.ears.algorithms.so.abc.ABC;
+import org.um.feri.ears.algorithms.so.bwo.BWO;
 import org.um.feri.ears.algorithms.so.gwo.GWO;
 import org.um.feri.ears.algorithms.so.jade.JADE;
 import org.um.feri.ears.algorithms.so.random.RandomWalkAlgorithm;
@@ -21,6 +22,7 @@ public class SOBenchmarkExample {
         ArrayList<Algorithm> algorithms = new ArrayList<Algorithm>();
         algorithms.add(new ABC());
         algorithms.add(new GWO());
+        algorithms.add(new BWO());
         algorithms.add(new TLBOAlgorithm());
         algorithms.add(new RandomWalkAlgorithm());
         algorithms.add(new JADE());

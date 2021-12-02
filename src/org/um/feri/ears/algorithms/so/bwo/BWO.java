@@ -33,19 +33,11 @@ public class BWO extends Algorithm {
 
     private DoubleSolution gBest;
 
-    //@AlgorithmParameter(name = "dof")
-    //private int dof;
-
-
-    private ArrayList<Pair<Double,Double>> bounds;
-
-    private ArrayList<Double> x0;
-
     private Task task;
 
 
     public BWO() {
-        this(0.6, 0.44, 0.4, 10, 50);
+        this(0.6, 0.44, 0.4, 50, 80);
     }
 
     public BWO(double pp, double cr, double pm, int npop, int maxiter) {
@@ -55,7 +47,6 @@ public class BWO extends Algorithm {
         this.pm = pm;
         this.npop = npop;
         this.maxiter = maxiter;
-        //this.dof = dof;
         setDebug(debug);  //EARS prints some debug info
         ai = new AlgorithmInfo("BWO", "Black widow optimisation", "");
         ai.addParameter(EnumAlgorithmParameters.UNNAMED1, pp + "");
@@ -66,42 +57,25 @@ public class BWO extends Algorithm {
         au = new Author("Alan Hablak", "alan.hablak@student.um.si");
     }
 
-
-
-
-
-    private ArrayList<Double> generateNewPosition(ArrayList<Double> _x0, int _dof, ArrayList<Pair<Double,Double>> _bounds){
-        ArrayList<Double> resultPosition = new ArrayList<Double>();
-        if(_x0 != null && _bounds != null){
-            for(int i = 0; i < _x0.size(); i++){
-                resultPosition.add(Math.min(Math.max(Util.nextDouble(-1,1)+_x0.get(i),_bounds.get(i).getLeft()), _bounds.get(i).getRight()));
-            }
-            return resultPosition;
+    private ArrayList<DoubleSolution> DeepCopy(ArrayList<DoubleSolution> o){
+        ArrayList<DoubleSolution> ret = new ArrayList<>();
+        for(int i = 0; i < o.size(); i++){
+            ret.add(new DoubleSolution(o.get(i)));
         }
-        else if(_bounds != null){
-            for(int i = 0; i < _bounds.size(); i++){
-                resultPosition.add(Util.nextDouble(_bounds.get(i).getLeft(), _bounds.get(i).getRight()));
-            }
-            return resultPosition;
-        }
-        else if(_x0 != null){
-            for(int i = 0; i < _x0.size(); i++) {
-                resultPosition.add(_x0.get(i) + Util.nextDouble(-1,1));
-            }
-            return resultPosition;
-        }
-        else if(_dof > 0){//todo?
-            for(int i = 0; i < _dof; i++){
-                resultPosition.add(Util.nextDouble(-1,1));
-            }
-            return resultPosition;
-        }
-        else {
-            return null;
-        }
+        return ret;
     }
 
-    //TODO CHECK IF STOP CRITERION
+
+    private double[] generateNewPosition(int _dof){
+        //ArrayList<Double> resultPosition = new ArrayList<Double>();
+        double[] res = new double[_dof];
+        for(int i = 0; i < _dof; i++){
+            //resultPosition.add(Util.nextDouble(-1,1));
+            res[i] = Util.nextDouble(-1,1);
+        }
+        return res;
+    }
+
     @Override
     public DoubleSolution execute(Task taskProblem) throws StopCriterionException {
         int dof;
@@ -110,36 +84,35 @@ public class BWO extends Algorithm {
         task.enableEvaluationHistory();
         dof = task.getNumberOfDimensions();
 
-        if(x0 != null) dof = x0.size();
-        else if(bounds != null) dof = bounds.size();
-
         int nr = (int)Math.floor(npop * pp);
         int nm = (int)Math.floor(npop * pm);
 
-        ArrayList<ArrayList<Double>> popInit = new ArrayList<ArrayList<Double>>();
+        ArrayList<double[]> popInit = new ArrayList<double[]>();
         for(int i = 0; i < npop; i++){
-            popInit.add(generateNewPosition(x0,dof,bounds));
+            popInit.add(generateNewPosition(dof));
         }
-
-        //ok
 
         ArrayList<DoubleSolution> pop = new ArrayList<DoubleSolution>();
         for(int epoch = 0; epoch < maxiter; epoch++) {
-            for (ArrayList<Double> l : popInit) {
-                double[] arr = l.stream().mapToDouble(Double::doubleValue).toArray();
-                pop.add(task.eval(arr));
+            if (task.isStopCriterion()) {
+                break;
             }
-            pop.sort(Comparator.comparing(DoubleSolution::getEval));//todo problematic?
-            ArrayList<DoubleSolution> pop1 = (ArrayList<DoubleSolution>) pop.clone();//todo deepcopy ok?
-            //ok
+            for (double[] l : popInit) {
+                pop.add(task.eval(l));
+            }
+            pop.sort(Comparator.comparing(DoubleSolution::getEval));
+            ArrayList<DoubleSolution> pop1 = new ArrayList<>(pop);
+            //ArrayList<DoubleSolution> pop1 = DeepCopy(pop);
             ArrayList<DoubleSolution> pop2 = new ArrayList<DoubleSolution>();
             ArrayList<DoubleSolution> pop3 = new ArrayList<DoubleSolution>();
 
             gBest = pop.get(0);
-            //ok
             for(int i = 0; i < nr; i++){
-                int i1 = Util.nextInt(0, pop1.size()-1);
-                int i2 = Util.nextInt(0, pop1.size()-1);
+                if (task.isStopCriterion()) {
+                    break;
+                }
+                int i1 = Util.nextInt(0, pop1.size());
+                int i2 = Util.nextInt(0, pop1.size());
                 DoubleSolution p1 = pop1.get(i1);
                 DoubleSolution p2 = pop1.get(i2);
                 ArrayList<double[]> children = new ArrayList<>();
@@ -160,13 +133,12 @@ public class BWO extends Algorithm {
                 else{
                     pop1.remove(i2);
                 }
-                //ok
 
                 ArrayList<DoubleSolution> tempChildren = new ArrayList<DoubleSolution>();
                 for (double[] l : children) {
                     tempChildren.add(task.eval(l));
                 }
-                tempChildren.sort(Comparator.comparing(DoubleSolution::getEval));//todo problematic?
+                tempChildren.sort(Comparator.comparing(DoubleSolution::getEval));
                 //ok
                 tempChildren = new ArrayList<>(tempChildren.subList(0, (int)(Math.max(children.size() * cr, 1))));//todo unnecessary and working??
                 for(int j = 0; j < tempChildren.size(); j++){
@@ -174,9 +146,12 @@ public class BWO extends Algorithm {
                 }
             }
             for(int i = 0; i < nm; i++){
-                DoubleSolution m = pop2.get(Util.nextInt(0, pop2.size()-1));
-                int cp1 = Util.nextInt(0, dof-1);
-                int cp2 = Util.nextInt(0, dof-1);
+                if (task.isStopCriterion()) {
+                    break;
+                }
+                DoubleSolution m = pop2.get(Util.nextInt(0, pop2.size()));
+                int cp1 = Util.nextInt(0, dof);
+                int cp2 = Util.nextInt(0, dof);
                 List<Double> vars = m.getVariables();
                 double temp = vars.get(cp1);
                 vars.set(cp1, vars.get(cp2));
@@ -188,14 +163,10 @@ public class BWO extends Algorithm {
             for(int i = 0; i < pop3.size(); i++){
                 pop2.add(pop3.get(i));
             }
-
-            pop = (ArrayList<DoubleSolution>) pop2.clone();//todo deepcopy??
+            pop = new ArrayList<>(pop2);
+            //pop = DeepCopy(pop2);
         }
-        //TODO PYTHON RAND IS INCLUSIVE
-        //IS IT ALSO IN HERE???
-        //TODO isstopcriterion
-
-        return task.eval(gBest.getDoubleVariables());//todo already evaled?
+        return gBest;
     }
 
     @Override
